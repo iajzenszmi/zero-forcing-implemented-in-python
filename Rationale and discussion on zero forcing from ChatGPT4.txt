@@ -1,0 +1,103 @@
+Inspiration for this exercise
+https://www.ams.org/journals/notices/202402/noti2874/noti2874.html
+
+Describe zero forcing and generate a full code complete executable demo program
+GPT
+
+Zero Forcing (ZF) is a linear method used in signal processing, particularly in the field of wireless communications. It's designed to mitigate the interference between multiple transmitted data streams in multi-antenna systems, such as MIMO (Multiple Input Multiple Output) systems. The basic idea is to use linear processing at the receiver to invert the effect of the channel, thus "forcing" the off-diagonal elements of the channel matrix to zero, hence the name "Zero Forcing."
+How Zero Forcing Works:
+
+In a MIMO system, multiple antennas at the transmitter send different data streams simultaneously over the same frequency band. These signals can interfere with each other at the receiving antennas. The received signal can be modeled as:
+
+Y=HX+N\mathbf{Y} = \mathbf{HX} + \mathbf{N}Y=HX+N
+
+Where:
+
+    Y\mathbf{Y}Y is the received signal vector.
+    H\mathbf{H}H is the channel matrix representing how each transmitted signal is affected by the channel.
+    X\mathbf{X}X is the transmitted signal vector.
+    N\mathbf{N}N is the noise vector.
+
+The goal of Zero Forcing is to find a matrix B\mathbf{B}B such that BHY=X\mathbf{BHY} = \mathbf{X}BHY=X. This is typically done by inverting the channel matrix H\mathbf{H}H.
+Limitations:
+
+    Zero Forcing can significantly amplify the noise, especially in scenarios where the channel matrix H\mathbf{H}H is ill-conditioned.
+    It assumes perfect knowledge of the channel matrix, which may not be realistic in dynamic environments.
+
+Code Demo:
+
+I'll create a Python program to demonstrate Zero Forcing in a simple MIMO system. This program will:
+
+    Generate a random channel matrix and a transmitted signal.
+    Apply the Zero Forcing algorithm to recover the transmitted signal at the receiver.
+
+For this demonstration, we'll use the numpy library for matrix operations. Let's write the full code:
+
+Here is the Python program that demonstrates the Zero Forcing algorithm in a simulated MIMO system. The program consists of two main functions:
+
+    zero_forcing(channel_matrix, received_signal): This function applies the Zero Forcing algorithm. It takes the channel matrix and the received signal as inputs and returns the estimated transmitted signal.
+
+    simulate_mimo_system(num_transmit_antennas, num_receive_antennas, noise_level): This function simulates a MIMO system. It randomly generates a channel matrix and a transmitted signal, simulates the received signal (including noise), and then applies Zero Forcing to estimate the transmitted signal.
+
+In the simulation, I used 3 transmitting antennas and 3 receiving antennas with a noise level of 0.1. The result shows the original transmitted signal and the estimated transmitted signal using Zero Forcing. The small discrepancies between these signals are due to noise and the limitations of Zero Forcing in perfectly recovering the transmitted signal, especially in the presence of noise.
+
+To use this code, you need to have Python installed with the numpy library. You can modify the parameters like the number of antennas and the noise level to see how they affect the performance of the Zero Forcing algorithm.
+import numpy as np
+
+def zero_forcing(channel_matrix, received_signal):
+    """
+    Apply Zero Forcing algorithm to recover the transmitted signal.
+
+    Args:
+    - channel_matrix (numpy array): The channel matrix H.
+    - received_signal (numpy array): The received signal Y.
+
+    Returns:
+    - numpy array: The estimated transmitted signal X.
+    """
+    # Inverting the channel matrix
+    pseudo_inverse = np.linalg.pinv(channel_matrix)
+    
+    # Recovering the transmitted signal
+    estimated_transmitted_signal = np.dot(pseudo_inverse, received_signal)
+    
+    return estimated_transmitted_signal
+
+def simulate_mimo_system(num_transmit_antennas, num_receive_antennas, noise_level):
+    """
+    Simulate a MIMO system with Zero Forcing.
+
+    Args:
+    - num_transmit_antennas (int): Number of transmitting antennas.
+    - num_receive_antennas (int): Number of receiving antennas.
+    - noise_level (float): Standard deviation of noise.
+
+    Returns:
+    - numpy array: Original transmitted signal.
+    - numpy array: Estimated transmitted signal using Zero Forcing.
+    """
+    # Generating a random channel matrix H
+    channel_matrix = np.random.randn(num_receive_antennas, num_transmit_antennas)
+
+    # Generating a random transmitted signal X
+    transmitted_signal = np.random.randn(num_transmit_antennas, 1)
+
+    # Simulating the received signal Y = HX + N
+    noise = np.random.randn(num_receive_antennas, 1) * noise_level
+    received_signal = np.dot(channel_matrix, transmitted_signal) + noise
+
+    # Applying Zero Forcing to estimate the transmitted signal
+    estimated_transmitted_signal = zero_forcing(channel_matrix, received_signal)
+
+    return transmitted_signal, estimated_transmitted_signal
+
+# Parameters for the simulation
+num_transmit_antennas = 3
+num_receive_antennas = 3
+noise_level = 0.1
+
+# Simulating the MIMO system
+original_signal, estimated_signal = simulate_mimo_system(num_transmit_antennas, num_receive_antennas, noise_level)
+
+original_signal, estimated_signal
+
